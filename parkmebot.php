@@ -10,7 +10,7 @@ if ($exploded_message_text[0] == "/start") {
 } else {
 	$result = setWebhook($update['message']['text']);
 	if ($result['ok'] == true) sendMessage($update['message']['chat']['id'],"Everything is set up correctly, your bot".$result['detail']['username']." is now parked...\nIf you are bored check out the @wj_bot which can tell jokes and generate random strings etc...😉");
-	else sendMessage($update['message']['chat']['id'],"Something went wrong, please check your input or contact @wjclub\n<b>Detail: </b><code>".var_export($response,true)."</code>");
+	else sendMessage($update['message']['chat']['id'],"Something went wrong, please check your input or contact @wjclub\n<b>Detail: </b><code>".var_export($response['detail'],true)."</code>");
 }
 
 function sendMessage($chat_id,$reply){
@@ -48,7 +48,7 @@ function setWebhook($token) {
 	if ($answer["ok"] == true) return ['ok' => true, 'detail' => json_decode(file_get_contents("https://api.telegram.org/bot".$token."/getMe"),true)];
 	else {
 		trigger_error($response);
-		return $response;
+		return ['ok' => false, 'detail' => $response];
 	}
 }
 
