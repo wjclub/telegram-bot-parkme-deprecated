@@ -14,7 +14,7 @@ $content = file_get_contents("php://input");
 $update = json_decode($content, true);
 $exploded_message_text = explode(" ",$update['message']['text']);
 if ($exploded_message_text[0] == "/start") {
-	sendMessage($update['message']['chat']['id'],"Hello, \nI am here to park bot usernames\nYou have to set this bot up in @botfather and forward the message containing the bot token to me.\nThen I set up a webhook which tells the innocent user who sends /start to your bot that its currently under development and thats it.\nQuite easy right?\nThen lets get started!\nSend me the bot token directly or the message from @botfather containing the token\n\n<b>NOTE: WE DO NOT STORE YOUR BOT TOKEN, JUST THE CHAT ID OF YOUR BOT TO PROVIDE CUSTOM MESSAGES (SOON)</b>\n\nSource code: https://github.com/wjclub/telegram-bot-parkme/"); 
+	sendMessage($update['message']['chat']['id'],"Hello, \nI am here to park bot usernames\nYou have to set your bot up in @botfather and forward the message containing the bot token to me.\nThen I set a webhook to a script which tells the innocent user who sends /start or any other message to your bot that its currently under development and thats it.\nQuite easy right?\nThen lets get started!\nSend me the bot token directly or a message from @botfather containing the token\n\n<b>NOTE: WE DO NOT STORE YOUR BOT TOKEN, JUST THE CHAT ID OF YOUR BOT TO PROVIDE CUSTOM MESSAGES (SOON)</b>\n\nSource code: https://github.com/wjclub/telegram-bot-parkme/"); 
 } else {
 	$result = setWebhook($update['message']['text']);
 	if ($result['ok'] == true) {
@@ -47,15 +47,23 @@ function setWebhook($token) {
 	if ($pos !== FALSE) {
 		$pos += strlen($searchstring) + 1;
 		$length = strpos($token,$endstring);
-		$length -= ($pos + 2);
-		$token = substr($token,$pos,$length);
+		if ($length !== FALSE) {
+			$length -= ($pos + 2);
+			$token = substr($token,$pos,$length);
+		} else {
+			$token = substr($token,$pos);
+		}
 	} else {
 		$pos = strpos($token,$othersearchstring);
 		if ($pos !== FALSE) {
-		$pos += strlen($othersearchstring) + 1;
-		$length = strpos($token,$endstring);
-		$length -= ($pos + 2);
-		$token = substr($token,$pos,$length);
+			$pos += strlen($othersearchstring) + 1;
+			$length = strpos($token,$endstring);
+			if ($length !== FALSE) {
+				$length -= ($pos + 2);
+				$token = substr($token,$pos,$length);
+			} else {
+				$token = substr($token,$pos);
+			}
 		}
 	}
 		file_get_contents("https://api.telegram.org/bot".$token."/setWebhook?url=");
@@ -63,7 +71,7 @@ function setWebhook($token) {
 	$answer = json_decode($response,true);
 	if ($answer["ok"] == true) return ['ok' => true, 'detail' => json_decode(file_get_contents("https://api.telegram.org/bot".$token."/getMe"), true)];
 	else {
-		return ['ok' => false, 'detail' => "Is ".$token." a valid bot token?"];
+		return ['ok' => false, 'detail' => "Is \"".$token."\" a valid bot token?"];
 	}
 }
 
